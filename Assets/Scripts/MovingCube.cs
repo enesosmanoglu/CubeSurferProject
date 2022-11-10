@@ -75,9 +75,9 @@ public class MovingCube : MonoBehaviour
     private void LavaRaycast()
     {
         Vector3 downForwardLeft = transform.position + (Vector3.down + Vector3.forward + Vector3.left) * halfSize;
-        Vector3 downForwardRight = transform.position + (Vector3.down + Vector3.forward + Vector3.left) * halfSize;
+        Vector3 downForwardRight = transform.position + (Vector3.down + Vector3.forward + Vector3.right) * halfSize;
         Vector3 downBackLeft = transform.position + (Vector3.down + Vector3.back + Vector3.left) * halfSize;
-        Vector3 downBackRight = transform.position + (Vector3.down + Vector3.back + Vector3.left) * halfSize;
+        Vector3 downBackRight = transform.position + (Vector3.down + Vector3.back + Vector3.right) * halfSize;
         Vector3 direction = Vector3.down;
         LayerMask layerMask = GameManager.Instance.cubeDownRayLayerMask;
 
