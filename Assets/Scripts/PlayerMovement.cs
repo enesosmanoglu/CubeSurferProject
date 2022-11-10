@@ -76,6 +76,12 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (other.gameObject.CompareTag("Cube"))
         {
+            if (other.transform.parent.CompareTag("Cube")) return;
+            for (int i = 0; i < other.transform.childCount; i++)
+            {
+                Transform child = other.transform.GetChild(other.transform.childCount-1-i);
+                GameManager.Instance.AddCube(child);
+            }
             GameManager.Instance.AddCube(other.transform);
             other.transform.position = new Vector3(
                 transform.position.x,

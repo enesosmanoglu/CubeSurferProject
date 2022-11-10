@@ -88,6 +88,7 @@ public class GameManager : MonoBehaviour
 
         foreach (var c in cubes)
         {
+            if (c.parent.CompareTag("Cube")) continue;
             c.position += Vector3.up * 1.1f;
         }
 
