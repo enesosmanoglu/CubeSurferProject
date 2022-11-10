@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Global Objects")]
     public GameObject player = null;
+    public Transform cubesParent = null;
     public GameObject trail = null;
     public Transform finishStairStart = null;
     public TMP_Text scoreText = null;
@@ -88,6 +89,7 @@ public class GameManager : MonoBehaviour
 
     public void AddCube(Transform cube)
     {
+        cube.SetParent(cubesParent);
         // playerRb.velocity = Vector3.zero;
         // playerRb.AddForce(Vector3.up * 300f);
         if (cubes.Count > 0)
@@ -95,9 +97,15 @@ public class GameManager : MonoBehaviour
         else
             player.transform.position += Vector3.up * 1.1f;
 
+        cube.position = new Vector3(
+            player.transform.position.x,
+            1f,
+            player.transform.position.z
+        );
+
         foreach (var c in cubes)
         {
-            if (c.parent.CompareTag("Cube")) continue;
+            
             c.position += Vector3.up * 1.1f;
         }
 

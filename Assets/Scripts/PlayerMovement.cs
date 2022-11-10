@@ -91,15 +91,10 @@ public class PlayerMovement : MonoBehaviour
             if (other.transform.parent.CompareTag("Cube")) return;
             for (int i = 0; i < other.transform.childCount; i++)
             {
-                Transform child = other.transform.GetChild(other.transform.childCount-1-i);
+                Transform child = other.transform.GetChild(other.transform.childCount - 1 - i);
                 GameManager.Instance.AddCube(child);
             }
             GameManager.Instance.AddCube(other.transform);
-            other.transform.position = new Vector3(
-                transform.position.x,
-                1f,
-                transform.position.z
-            ); // Cube
         }
         else if (other.gameObject.CompareTag("Finish") || other.gameObject.CompareTag("FinishStair"))
         {
@@ -117,7 +112,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (other.gameObject.CompareTag("Lava"))
         {
-            GameManager.Instance.DestroyCube(transform);
+            // GameManager.Instance.DestroyCube(transform);
             Debug.Log("YOU LOSE");
             Destroy(this);
             GameManager.Instance.GameOver();
