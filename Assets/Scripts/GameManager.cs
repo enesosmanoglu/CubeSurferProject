@@ -119,7 +119,11 @@ public class GameManager : MonoBehaviour
         // playerRb.AddForce(Vector3.up * 300f);
         // player.transform.position -= Vector3.up;
         cubes.Remove(cube);
-        Destroy(cube.gameObject);
+        Destroy(cube.gameObject.GetComponent<BoxCollider>());
+        Destroy(cube.gameObject.GetComponent<MovingCube>());
+        // cube.position = new Vector3(-20, -20, -20);
+        StartCoroutine("DestroyObjs", new GameObject[] { cube.gameObject });
+        // Destroy(cube.gameObject);
     }
 
     public void GameOver()
@@ -135,5 +139,12 @@ public class GameManager : MonoBehaviour
         Debug.Log("Finished Coroutine at timestamp : " + Time.time);
         GameManager.Instance.isGameOver = true;
     }
+    IEnumerator DestroyObjs(GameObject[] objs)
+    {
+        yield return new WaitForSeconds(3f);
+        foreach (GameObject obj in objs)
+            Destroy(obj);
+    }
+
 
 }
