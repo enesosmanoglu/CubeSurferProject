@@ -37,12 +37,12 @@ public class MainMenuPlayerMovement : MonoBehaviour
             if (touchRelative.x != 0)
             {
                 transform.position = new Vector3(
-                    Mathf.Clamp(touchStartPlayer.x + touchRelative.x, -2f, +2f),
+                    Mathf.Clamp(touchStartPlayer.x + touchRelative.x, -3f, +3f),
                     transform.position.y,
                     transform.position.z
                 );
                 cam.transform.position = new Vector3(
-                    Mathf.Clamp(touchStartCam.x + touchRelative.x / 10, -2f, +2f),
+                    Mathf.Clamp(touchStartCam.x + touchRelative.x / 10, -3f, +3f),
                     cam.transform.position.y,
                     cam.transform.position.z
                 );
