@@ -26,6 +26,9 @@ public class GameManager : MonoBehaviour
     public GameObject trail = null;
     public Transform finishStairStart = null;
     public TMP_Text scoreText = null;
+    [Space(5)]
+    public LayerMask cubeForwardRayLayerMask;
+    public LayerMask cubeDownRayLayerMask;
 
     [Header("Global Settings")]
     public float playerMoveSpeed = 0.2f;
@@ -92,22 +95,22 @@ public class GameManager : MonoBehaviour
         cube.SetParent(cubesParent);
         // playerRb.velocity = Vector3.zero;
         // playerRb.AddForce(Vector3.up * 300f);
-        if (cubes.Count > 0)
-            player.transform.position = cubes[0].position + Vector3.up * 3f;
-        else
-            player.transform.position += Vector3.up * 1.1f;
-
         cube.position = new Vector3(
             player.transform.position.x,
             1f,
             player.transform.position.z
         );
 
-        foreach (var c in cubes)
+        for (int i = 0; i < cubes.Count; i++)
         {
-            
-            c.position += Vector3.up * 1.1f;
+            Transform c = cubes[cubes.Count - 1 - i];
+            c.position = cube.position + (i + 1) * 1.1f * Vector3.up;
         }
+
+        if (cubes.Count > 0)
+            player.transform.position = cubes[0].position + Vector3.up * 1.5f;
+        else
+            player.transform.position += Vector3.up * 1.01f;
 
         cubes.Add(cube);
         cube.gameObject.tag = "MovingCube";
