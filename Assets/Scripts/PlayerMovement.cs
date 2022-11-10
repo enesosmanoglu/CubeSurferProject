@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     Vector3 touchStart;
     Vector3 touchRelative;
     Vector3 touchStartPlayer;
+    Vector3 touchStartCam;
 
     Camera cam;
 
@@ -36,6 +37,7 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("Mousedown");
             touchStart = Input.mousePosition;
             touchStartPlayer = transform.position;
+            touchStartCam = cam.transform.position;
             Debug.Log(touchStart);
             Debug.Log(touchStartPlayer);
         }
@@ -48,6 +50,11 @@ public class PlayerMovement : MonoBehaviour
                     Mathf.Clamp(touchStartPlayer.x + touchRelative.x, -2f, +2f),
                     transform.position.y,
                     transform.position.z
+                );
+                cam.transform.position = new Vector3(
+                    Mathf.Clamp(touchStartCam.x + touchRelative.x / 10, -2f, +2f),
+                    cam.transform.position.y,
+                    cam.transform.position.z
                 );
             }
         }
