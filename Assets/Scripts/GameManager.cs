@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Global Objects")]
     public GameObject player = null;
+    public GameObject trail = null;
     public Transform finishStairStart = null;
     public TMP_Text scoreText = null;
 
@@ -33,6 +34,7 @@ public class GameManager : MonoBehaviour
     public Animator playerAnim = null;
     public Camera cam;
     public Vector3 camStartPos = Vector3.zero;
+    public Vector3 trailStartPos = Vector3.zero;
 
     [Space(10)]
     public List<Transform> cubes;
@@ -50,6 +52,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         camStartPos = cam.transform.position;
+        trailStartPos = trail.transform.position;
     }
 
     private void Update()
@@ -69,6 +72,12 @@ public class GameManager : MonoBehaviour
             cam.transform.position.x,
             camStartPos.y + h,
             cam.transform.position.z
+        );
+
+        trail.transform.position = new Vector3(
+            trail.transform.position.x,
+            trailStartPos.y + h,
+            trail.transform.position.z
         );
     }
     public void AddScore(int c = 1)

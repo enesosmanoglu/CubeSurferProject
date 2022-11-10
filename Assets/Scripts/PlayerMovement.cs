@@ -25,6 +25,11 @@ public class PlayerMovement : MonoBehaviour
         transform.Translate(moveVec);
         cam.transform.Translate(moveVec, Space.World);
         GameManager.Instance.scoreText.transform.Translate(moveVec, Space.World);
+        GameManager.Instance.trail.transform.position = new Vector3(
+            transform.position.x,
+            GameManager.Instance.trail.transform.position.y,
+            transform.position.z
+        );
 
         if (Input.GetMouseButtonDown(0))
         {
