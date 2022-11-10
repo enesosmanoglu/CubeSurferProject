@@ -128,6 +128,11 @@ public class GameManager : MonoBehaviour
         StartCoroutine("DestroyObjs", new GameObject[] { cube.gameObject });
         // Destroy(cube.gameObject);
     }
+    public void DestroyPlayer()
+    {
+        Destroy(player.gameObject.GetComponent<CapsuleCollider>());
+        StartCoroutine("DestroyObjs", new GameObject[] { player.gameObject });
+    }
 
     public void GameOver()
     {

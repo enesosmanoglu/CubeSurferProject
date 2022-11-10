@@ -112,7 +112,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (other.gameObject.CompareTag("Lava"))
         {
-            // GameManager.Instance.DestroyCube(transform);
+            GameManager.Instance.DestroyPlayer();
             Debug.Log("YOU LOSE");
             Destroy(this);
             GameManager.Instance.GameOver();
