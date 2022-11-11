@@ -5,5 +5,8 @@
 
 • **ENES OSMANOĞLU (19290319)**
 
-### Demo Gameplay Video (12.11.2022)
-[![Project Screenshot](https://cdn.discordapp.com/attachments/1038850649401606225/1038851237736628305/cubesurferdemo1.png)](https://www.youtube.com/watch?v=OPwawzwdofI)
+### Download the game:
+• You can see builds in the [Releases](https://github.com/enesosmanoglu/CubeSurferProject/releases) page.
+
+### Watch the gameplay video: 
+[![Gameplay YouTube Video](https://img.youtube.com/vi/OPwawzwdofI/0.jpg)](https://www.youtube.com/watch?v=OPwawzwdofI)
