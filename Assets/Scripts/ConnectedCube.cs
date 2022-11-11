@@ -115,7 +115,10 @@ public class ConnectedCube : MonoBehaviour
         {
             Debug.Log("YOU WIN");
             GameManager.Instance.levelPassed = true;
-            StartCoroutine(DestroyObj());
+            foreach (Transform cube in GameManager.Instance.cubes)
+            {
+                StartCoroutine(cube.GetComponent<ConnectedCube>().DestroyObj());
+            }
             Destroy(GameManager.Instance.player.GetComponent<PlayerMovement>());
             GameManager.Instance.GameOver();
         }
@@ -130,7 +133,7 @@ public class ConnectedCube : MonoBehaviour
         }
     }
 
-    IEnumerator DestroyObj()
+    public IEnumerator DestroyObj()
     {
         yield return new WaitForSeconds(2f);
         Destroy(gameObject);
