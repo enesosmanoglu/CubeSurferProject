@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MovingCube : MonoBehaviour
+public class ConnectedCube : MonoBehaviour
 {
     float halfSize;
     private void Awake()
@@ -11,6 +11,8 @@ public class MovingCube : MonoBehaviour
     }
     private void Update()
     {
+        if (tag == "Untagged") return;
+
         SyncPosWithPlayer();
 
         WallAndFinishRaycast();
@@ -60,13 +62,11 @@ public class MovingCube : MonoBehaviour
         )
         {
             Debug.Log(name + " hit a " + LayerMask.LayerToName(hitResult.transform.gameObject.layer));
-            Destroy(this);
             tag = "Untagged";
-            if (hitResult.transform.CompareTag("Wall"))
-            {
-                GameManager.Instance.cubes.Remove(transform);
-            }
-            else if (hitResult.transform.CompareTag("FinishStair"))
+            GameManager.Instance.cubes.Remove(transform);
+            StartCoroutine(DestroyObj());
+
+            if (hitResult.transform.CompareTag("FinishStair"))
             {
                 GameManager.Instance.AdjustCameraPos((hitResult.collider.transform.position.y - GameManager.Instance.finishStairStart.position.y));
             }
@@ -101,28 +101,24 @@ public class MovingCube : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        Debug.Log(name + " collided with " + other.gameObject.name);
-
         if (other.gameObject.CompareTag("Cube"))
         {
             if (other.transform.parent.CompareTag("Cube")) return;
-            // other.transform.position = transform.position;
             for (int i = 0; i < other.transform.childCount; i++)
             {
                 Transform child = other.transform.GetChild(other.transform.childCount - 1 - i);
                 GameManager.Instance.AddCube(child);
             }
             GameManager.Instance.AddCube(other.transform);
-            // other.transform.position = transform.position + Vector3.up * 1.1f;
         }
         else if (other.gameObject.CompareTag("Finish"))
         {
             Debug.Log("YOU WIN");
-            Destroy(this);
+            GameManager.Instance.levelPassed = true;
+            StartCoroutine(DestroyObj());
             Destroy(GameManager.Instance.player.GetComponent<PlayerMovement>());
             GameManager.Instance.GameOver();
         }
-
     }
 
     private void OnTriggerEnter(Collider other)
@@ -134,4 +130,9 @@ public class MovingCube : MonoBehaviour
         }
     }
 
+    IEnumerator DestroyObj()
+    {
+        yield return new WaitForSeconds(2f);
+        Destroy(gameObject);
+    }
 }

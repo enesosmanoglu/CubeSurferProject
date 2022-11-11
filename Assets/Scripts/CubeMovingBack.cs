@@ -2,30 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainMenuMovingCube : MonoBehaviour
+public class CubeMovingBack : MonoBehaviour
 {
     float halfSize;
     private void Awake()
     {
         halfSize = transform.localScale.x * .5f;
     }
-    private void Update()
+    void Update()
     {
-        SyncPosWithPlayer();
-
         LavaRaycast();
-    }
 
-    private void SyncPosWithPlayer()
-    {
-        Vector3 playerPos = GameManager.Instance.player.transform.position;
-        transform.position = new Vector3(
-            playerPos.x,
-            transform.position.y,
-            playerPos.z
-        );
-    }
+        Vector3 moveVec = Vector3.back * Time.deltaTime * GameManager.Instance.playerForwardSpeed;
+        transform.Translate(moveVec);
 
+        // float playerDist = GameManager.Instance.player.transform.position.z - transform.position.z;
+        // if (playerDist > 5f)
+        // {
+        //     Transform lastChild = transform.parent.GetChild(transform.parent.childCount - 1);
+        //     transform.position = lastChild.position + Vector3.forward * GameManager.Instance.cubeSpawnMargin;
+        //     transform.SetAsLastSibling();
+        // }
+    }
     private void LavaRaycast()
     {
         Vector3 downForwardLeft = transform.position + (Vector3.down + Vector3.forward + Vector3.left) * halfSize;
@@ -49,27 +47,20 @@ public class MainMenuMovingCube : MonoBehaviour
         )
         {
             Debug.Log(name + " hit a lava");
-            MainMenuGameManager.Instance.DestroyCube(transform);
+            GameManager.Instance.DestroyCube(transform);
+            StartCoroutine(DestroyEnum());
+            transform.parent = null;
+            GameManager.Instance.SpawnCube();
         }
     }
-
-    private void OnCollisionEnter(Collision other)
+    IEnumerator DestroyEnum()
     {
-        Debug.Log(name + " collided with " + other.gameObject.name);
-
-        if (other.gameObject.CompareTag("Cube"))
+        if (GameManager.Instance.playerForwardSpeed == 0f)
         {
-            if (other.transform.parent.CompareTag("Cube")) return;
-            // other.transform.position = transform.position;
-            for (int i = 0; i < other.transform.childCount; i++)
-            {
-                Transform child = other.transform.GetChild(other.transform.childCount - 1 - i);
-                MainMenuGameManager.Instance.AddCube(child);
-            }
-            MainMenuGameManager.Instance.AddCube(other.transform);
-            // other.transform.position = transform.position + Vector3.up * 1.1f;
+            Destroy(this);
+            yield break;
         }
-
+        yield return new WaitForSeconds(1 / GameManager.Instance.playerForwardSpeed);
+        Destroy(this);
     }
-
 }

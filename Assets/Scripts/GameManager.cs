@@ -11,61 +11,138 @@ public class GameManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
+            Destroy(this.gameObject);
             Destroy(this);
         }
         else
         {
             Instance = this;
+            DontDestroyOnLoad(this.gameObject);
         }
     }
     #endregion
 
-    [Header("Global Objects")]
+    [Header("Global Settings")]
+    [Range(1, 10)] public int startCubeCount = 1;
+    [Range(0, 16)] public float playerForwardSpeed = 7f;
+    [Range(0, 10)] public float playerHorizontalSpeed = 1f;
+    public LayerMask cubeForwardRayLayerMask;
+    public LayerMask cubeDownRayLayerMask;
+    public int diamonds = 0;
+    public bool isGameOver = false;
+    public bool levelPassed = false;
+
+    [Header("Drag and drop from files")]
+    public GameObject cubePrefab = null;
+
+    [Header("Will be assigned automatically at runtime")]
     public GameObject player = null;
+    public Transform platform = null;
     public Transform cubesParent = null;
+    public Transform connectedCubesParent = null;
     public GameObject trail = null;
     public Transform finishStairStart = null;
     public TMP_Text scoreText = null;
-    [Space(5)]
-    public LayerMask cubeForwardRayLayerMask;
-    public LayerMask cubeDownRayLayerMask;
-
-    [Header("Global Settings")]
-    public float playerMoveSpeed = 0.2f;
-
-    [Header("Don't Touch")]
     public Rigidbody playerRb = null;
     public Animator playerAnim = null;
     public Camera cam;
     public Vector3 camStartPos = Vector3.zero;
     public Vector3 trailStartPos = Vector3.zero;
+    public Scene activeScene;
 
-    [Space(10)]
+    [Space(5)]
     public List<Transform> cubes;
-    public int diamonds = 0;
 
-    public bool isGameOver = false;
+    [Header("Main Menu Settings")]
+    [Range(1, 50)] public int requiredCubeCountToStartGame = 10;
+    public Vector3 cubeSpawnPoint = new Vector3(2f, 1f, 10f);
+    [Range(1, 20)] public int cubeSpawnMargin = 4;
+    public int spawnCountOnStart = 100;
+    [Range(0, 16)] public float mainMenuPlayerInitForwardSpeed = 10f;
+    private float playerForwardSpeedCache = -1f;
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += (Scene scene, LoadSceneMode loadSceneMode) =>
+        {
+            activeScene = scene;
+            Debug.Log("Scene changed to " + scene.buildIndex);
+            player = GameObject.FindGameObjectWithTag("Player");
+            platform = GameObject.FindGameObjectWithTag("Platform")?.transform;
+            cubesParent = GameObject.FindGameObjectWithTag("CubesParent")?.transform;
+            connectedCubesParent = GameObject.FindGameObjectWithTag("ConnectedCubesParent")?.transform;
+            trail = GameObject.FindGameObjectWithTag("Trail");
+            finishStairStart = GameObject.FindGameObjectWithTag("StairStart")?.transform;
+            scoreText = GameObject.FindGameObjectWithTag("ScoreText")?.GetComponent<TMP_Text>();
+
+            cam = Camera.main;
+            playerRb = player.GetComponent<Rigidbody>();
+            playerAnim = player.GetComponent<Animator>();
+            cubes = new List<Transform>();
+
+            camStartPos = cam.transform.position;
+            trailStartPos = trail.transform.position;
+
+            for (int i = 0; i < startCubeCount; i++)
+            {
+                GameObject cube = Instantiate(cubePrefab, Vector3.zero, Quaternion.identity, cubesParent);
+                AddCube(cube.transform);
+            }
+
+            isGameOver = false;
+            levelPassed = false;
+            scoreText.text = diamonds.ToString();
+
+            if (scene.buildIndex == 0)
+            {
+                playerForwardSpeedCache = playerForwardSpeed;
+                playerForwardSpeed = mainMenuPlayerInitForwardSpeed;
+                for (int i = 0; i < spawnCountOnStart; i++)
+                    SpawnCube();
+            }
+            else
+            {
+                if (playerForwardSpeedCache >= 0 && playerForwardSpeedCache != playerForwardSpeed)
+                {
+                    playerForwardSpeed = playerForwardSpeedCache;
+                    playerForwardSpeedCache = -1f;
+                }
+            }
+        };
+    }
     private void Awake()
     {
         Singleton();
-        cam = Camera.main;
-        playerRb = player.GetComponent<Rigidbody>();
-        playerAnim = player.GetComponent<Animator>();
-        cubes = new List<Transform>();
     }
-    private void Start()
+
+    public void Start()
     {
-        camStartPos = cam.transform.position;
-        trailStartPos = trail.transform.position;
+        Debug.Log("Game started");
+        diamonds = PlayerPrefs.GetInt("diamonds", 0);
+        scoreText.text = diamonds.ToString();
     }
 
     private void Update()
     {
+        if (activeScene.buildIndex == 0)
+        {
+            int remainingCubes = (requiredCubeCountToStartGame - cubes.Count);
+            scoreText.text = "Collect <color=\"red\"><size=220%>" + remainingCubes + "</size></color> more cubes to start game";
+
+            if (remainingCubes == 0)
+            {
+                SceneManager.LoadScene("Level01");
+            }
+            return;
+        }
         if (isGameOver)
         {
             if (Input.GetMouseButton(0))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                int buildIndex = SceneManager.GetActiveScene().buildIndex;
+                int loadSceneIndex = levelPassed ? (buildIndex + 1) % SceneManager.sceneCountInBuildSettings : buildIndex;
+                if (loadSceneIndex == 0) loadSceneIndex = 1;
+                SceneManager.LoadScene(loadSceneIndex);
             }
         }
     }
@@ -88,11 +165,14 @@ public class GameManager : MonoBehaviour
     {
         diamonds += c;
         scoreText.SetText(diamonds.ToString());
+        PlayerPrefs.SetInt("diamonds", diamonds);
     }
 
     public void AddCube(Transform cube)
     {
-        cube.SetParent(cubesParent);
+        cube.SetParent(connectedCubesParent);
+        if (activeScene.buildIndex == 0)
+            SpawnCube();
         // playerRb.velocity = Vector3.zero;
         // playerRb.AddForce(Vector3.up * 300f);
         cube.position = new Vector3(
@@ -105,6 +185,7 @@ public class GameManager : MonoBehaviour
         {
             Transform c = cubes[cubes.Count - 1 - i];
             c.position = cube.position + (i + 1) * 1.1f * Vector3.up;
+            c.GetComponent<Rigidbody>().velocity = Vector3.zero;
         }
 
         if (cubes.Count > 0)
@@ -113,8 +194,8 @@ public class GameManager : MonoBehaviour
             player.transform.position += Vector3.up * 1.01f;
 
         cubes.Add(cube);
-        cube.gameObject.tag = "MovingCube";
-        cube.gameObject.AddComponent<MovingCube>();
+        cube.gameObject.tag = "ConnectedCube";
+        cube.gameObject.AddComponent<ConnectedCube>();
     }
     public void DestroyCube(Transform cube)
     {
@@ -123,7 +204,7 @@ public class GameManager : MonoBehaviour
         // player.transform.position -= Vector3.up;
         cubes.Remove(cube);
         Destroy(cube.gameObject.GetComponent<BoxCollider>());
-        Destroy(cube.gameObject.GetComponent<MovingCube>());
+        Destroy(cube.gameObject.GetComponent<ConnectedCube>());
         // cube.position = new Vector3(-20, -20, -20);
         StartCoroutine("DestroyObjs", new GameObject[] { cube.gameObject });
         // Destroy(cube.gameObject);
@@ -154,5 +235,17 @@ public class GameManager : MonoBehaviour
             Destroy(obj);
     }
 
-
+    public GameObject SpawnCube()
+    {
+        Vector3 spawnPos = cubeSpawnPoint;
+        if (cubesParent.childCount > 0)
+        {
+            Transform lastChild = cubesParent.GetChild(cubesParent.childCount - 1);
+            spawnPos = lastChild.position + Vector3.forward * GameManager.Instance.cubeSpawnMargin;
+        }
+        GameObject cube = Instantiate(cubePrefab, spawnPos, Quaternion.identity, cubesParent);
+        if (activeScene.buildIndex == 0)
+            cube.AddComponent<CubeMovingBack>();
+        return cube;
+    }
 }

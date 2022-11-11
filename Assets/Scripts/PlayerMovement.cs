@@ -1,14 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
     Vector3 startPos = Vector3.zero;
     Vector3 touchStart;
     Vector3 touchRelative;
-    Vector3 touchStartPlayer;
-    Vector3 touchStartCam;
+    Vector3 playerPosOnTouch;
+    Vector3 camPosOnTouch;
 
     Camera cam;
 
@@ -22,71 +23,15 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Update()
     {
-        Vector3 moveVec = Vector3.forward * Time.deltaTime * GameManager.Instance.playerMoveSpeed;
-        transform.Translate(moveVec);
-        cam.transform.Translate(moveVec, Space.World);
-        GameManager.Instance.scoreText.transform.Translate(moveVec, Space.World);
-        GameManager.Instance.trail.transform.position = new Vector3(
-            transform.position.x,
-            GameManager.Instance.trail.transform.position.y,
-            transform.position.z
-        );
+        if (SceneManager.GetActiveScene().buildIndex != 0)
+            MoveForward();
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            Debug.Log("Mousedown");
-            touchStart = Input.mousePosition;
-            touchStartPlayer = transform.position;
-            touchStartCam = cam.transform.position;
-            Debug.Log(touchStart);
-            Debug.Log(touchStartPlayer);
-        }
-        if (Input.GetMouseButton(0))
-        {
-            touchRelative = (Input.mousePosition - touchStart) / 100;
-            if (touchRelative.x != 0)
-            {
-                transform.position = new Vector3(
-                    Mathf.Clamp(touchStartPlayer.x + touchRelative.x, -2f, +2f),
-                    transform.position.y,
-                    transform.position.z
-                );
-                cam.transform.position = new Vector3(
-                    Mathf.Clamp(touchStartCam.x + touchRelative.x / 10, -2f, +2f),
-                    cam.transform.position.y,
-                    cam.transform.position.z
-                );
-            }
-        }
-        if (Input.GetMouseButtonUp(0))
-        {
-            Debug.Log("Mouseup");
-        }
-
-        RaycastHit hitResult;
-        if (Physics.Linecast(transform.position + Vector3.down * 0.2f + Vector3.right * 0.2f, transform.position + Vector3.up * 0.2f + Vector3.left * 0.2f + Vector3.forward * 0.5f, out hitResult))
-        {
-            Debug.Log($"Player hitted: {hitResult.collider.name}");
-            if (hitResult.collider.CompareTag("Wall"))
-            {
-
-            }
-        }
+        MoveHorizontal();
     }
 
     private void OnCollisionEnter(Collision other)
     {
-        if (other.gameObject.CompareTag("Wall"))
-        {
-            GameManager.Instance.playerRb.constraints = RigidbodyConstraints.None;
-            Debug.Log((other.transform.position - GameManager.Instance.player.transform.position));
-            GameManager.Instance.playerRb.AddForce(300f * (other.transform.position - GameManager.Instance.player.transform.position));
-            Debug.Log("YOU LOSE");
-            Destroy(this);
-            GameManager.Instance.GameOver();
-            // GameManager.Instance.playerAnim.SetBool("isGameOver", true);
-        }
-        else if (other.gameObject.CompareTag("Cube"))
+        if (other.gameObject.CompareTag("Cube"))
         {
             if (other.transform.parent.CompareTag("Cube")) return;
             for (int i = 0; i < other.transform.childCount; i++)
@@ -96,9 +41,19 @@ public class PlayerMovement : MonoBehaviour
             }
             GameManager.Instance.AddCube(other.transform);
         }
+        else if (other.gameObject.CompareTag("Wall"))
+        {
+            Debug.Log("YOU LOSE");
+            GameManager.Instance.playerRb.constraints = RigidbodyConstraints.None;
+            GameManager.Instance.playerRb.AddForce(300f * (other.transform.position - transform.position).normalized);
+            Destroy(this);
+            GameManager.Instance.GameOver();
+            // GameManager.Instance.playerAnim.SetBool("isGameOver", true);
+        }
         else if (other.gameObject.CompareTag("Finish") || other.gameObject.CompareTag("FinishStair"))
         {
             Debug.Log("YOU WIN");
+            GameManager.Instance.levelPassed = true;
             Destroy(this);
             GameManager.Instance.GameOver();
         }
@@ -112,10 +67,53 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (other.gameObject.CompareTag("Lava"))
         {
-            GameManager.Instance.DestroyPlayer();
+            if (SceneManager.GetActiveScene().buildIndex == 0) return;
+
             Debug.Log("YOU LOSE");
+            GameManager.Instance.DestroyPlayer();
             Destroy(this);
             GameManager.Instance.GameOver();
+        }
+    }
+
+    private void MoveForward()
+    {
+        Vector3 moveVec = Vector3.forward * Time.deltaTime * GameManager.Instance.playerForwardSpeed;
+        transform.Translate(moveVec);
+        cam.transform.Translate(moveVec, Space.World);
+        GameManager.Instance.scoreText.transform.Translate(moveVec, Space.World);
+        GameManager.Instance.trail.transform.position = new Vector3(
+            transform.position.x,
+            GameManager.Instance.trail.transform.position.y,
+            transform.position.z
+        );
+    }
+    private void MoveHorizontal()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            touchStart = Input.mousePosition;
+            playerPosOnTouch = transform.position;
+            camPosOnTouch = cam.transform.position;
+        }
+        if (Input.GetMouseButton(0))
+        {
+            touchRelative = (Input.mousePosition - touchStart) / 100;
+            touchRelative.x *= GameManager.Instance.playerHorizontalSpeed;
+            if (touchRelative.x != 0)
+            {
+                int bounds = (int)(GameManager.Instance.platform.localScale.x / 2);
+                transform.position = new Vector3(
+                    Mathf.Clamp(playerPosOnTouch.x + touchRelative.x, -bounds, +bounds),
+                    transform.position.y,
+                    transform.position.z
+                );
+                cam.transform.position = new Vector3(
+                    Mathf.Clamp(camPosOnTouch.x + touchRelative.x / 10, -bounds, +bounds),
+                    cam.transform.position.y,
+                    cam.transform.position.z
+                );
+            }
         }
     }
 }
