@@ -5,11 +5,17 @@ TagManager:
   serializedVersion: 2
   tags:
   - Cube
-  - MovingCube
   - Wall
   - Diamond
   - FinishStair
   - Lava
+  - CubesParent
+  - Trail
+  - ScoreText
+  - StairStart
+  - ConnectedCube
+  - Platform
+  - ConnectedCubesParent
   layers:
   - Default
   - TransparentFX
