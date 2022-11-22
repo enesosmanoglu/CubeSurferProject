@@ -44,7 +44,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startCubeCount: 1
-  playerMoveSpeed: 7
+  playerForwardSpeed: 7
+  playerHorizontalSpeed: 1
   cubeForwardRayLayerMask:
     serializedVersion: 2
     m_Bits: 1920
@@ -53,10 +54,23 @@ MonoBehaviour:
     m_Bits: 64
   diamonds: 0
   isGameOver: 0
+  isGamePaused: 0
   levelPassed: 0
+  requiredCubeCountToStartGame: 8
+  cubeSpawnPoint: {x: 2, y: 1, z: 10}
+  cubeSpawnMargin: 4
+  spawnCountOnStart: 100
+  mainMenuPlayerInitForwardSpeed: 10
   cubePrefab: {fileID: 990233295749259104, guid: a61953ca0ad79874d8bca5eec3fee7ab, type: 3}
+  pickCubeSound: {fileID: 8300000, guid: ffb159a21c8a04135a5616979c828fab, type: 3}
+  hitWallSound: {fileID: 8300000, guid: d77bed084f023674aa462b28415d03a8, type: 3}
+  diamondSound: {fileID: 8300000, guid: 7bd6b897eb5ca4b7d88a205c4a51640c, type: 3}
+  levelPassedSound: {fileID: 8300000, guid: c61813c5e67f22b4daf7616845ce3cc6, type: 3}
+  cubeDestroySound: {fileID: 8300000, guid: 248a22138184b96439c66822ceea057b, type: 3}
   player: {fileID: 0}
+  platform: {fileID: 0}
   cubesParent: {fileID: 0}
+  connectedCubesParent: {fileID: 0}
   trail: {fileID: 0}
   finishStairStart: {fileID: 0}
   scoreText: {fileID: 0}
@@ -65,4 +79,13 @@ MonoBehaviour:
   cam: {fileID: 0}
   camStartPos: {x: 0, y: 0, z: 0}
   trailStartPos: {x: 0, y: 0, z: 0}
+  activeScene:
+    m_Handle: 0
+  pauseButton: {fileID: 0}
+  pausePanelButton: {fileID: 0}
+  diamondCountText: {fileID: 0}
+  tryAgainButton: {fileID: 0}
+  nextLevelButton: {fileID: 0}
+  mainLevelButton: {fileID: 0}
+  gameOverPanel: {fileID: 0}
   cubes: []
