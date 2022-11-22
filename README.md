@@ -9,4 +9,4 @@
 • You can see builds in the [Releases](https://github.com/enesosmanoglu/CubeSurferProject/releases) page.
 
 ### Watch the gameplay video: 
-[![Gameplay YouTube Video](https://yt-embed.herokuapp.com/embed?v=OPwawzwdofI)](https://www.youtube.com/watch?v=OPwawzwdofI)
+[![Gameplay YouTube Video](https://yt-embed.herokuapp.com/embed?v=aLZJbNlVL_4)](https://youtu.be/aLZJbNlVL_4)
