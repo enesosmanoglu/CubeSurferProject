@@ -16,6 +16,13 @@ TagManager:
   - ConnectedCube
   - Platform
   - ConnectedCubesParent
+  - PauseButton
+  - PausePanel
+  - DiamondCount
+  - NextLevelButton
+  - MainLevelButton
+  - GameOverPanel
+  - TryAgainButton
   layers:
   - Default
   - TransparentFX

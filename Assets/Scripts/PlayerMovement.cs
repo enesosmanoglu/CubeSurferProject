@@ -23,6 +23,8 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Update()
     {
+        if (GameManager.Instance.isGamePaused) return;
+
         if (SceneManager.GetActiveScene().buildIndex != 0)
             MoveForward();
 
@@ -44,11 +46,10 @@ public class PlayerMovement : MonoBehaviour
         else if (other.gameObject.CompareTag("Wall"))
         {
             Debug.Log("YOU LOSE");
-            GameManager.Instance.playerRb.constraints = RigidbodyConstraints.None;
-            GameManager.Instance.playerRb.AddForce(300f * (other.transform.position - transform.position).normalized);
+            GameManager.Instance.playerRb.constraints = RigidbodyConstraints.FreezeRotation;
+            GameManager.Instance.playerRb.AddForce(-(other.transform.position - transform.position).normalized, ForceMode.Impulse);
             Destroy(this);
             GameManager.Instance.GameOver();
-            // GameManager.Instance.playerAnim.SetBool("isGameOver", true);
         }
         else if (other.gameObject.CompareTag("Finish") || other.gameObject.CompareTag("FinishStair"))
         {
@@ -62,8 +63,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Diamond"))
         {
-            Destroy(other.gameObject);
-            GameManager.Instance.AddScore();
+            // Destroy(other.gameObject);
+            GameManager.Instance.HitDiamond(other.gameObject);
         }
         else if (other.gameObject.CompareTag("Lava"))
         {

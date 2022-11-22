@@ -8,9 +8,12 @@ public class ConnectedCube : MonoBehaviour
     private void Awake()
     {
         halfSize = transform.localScale.x * .5f;
+        AudioSource.PlayClipAtPoint(GameManager.Instance.pickCubeSound, transform.position);
     }
     private void Update()
     {
+        if (GameManager.Instance.isGamePaused) return;
+
         if (tag == "Untagged") return;
 
         SyncPosWithPlayer();
@@ -96,6 +99,7 @@ public class ConnectedCube : MonoBehaviour
         {
             Debug.Log(name + " hit a lava");
             GameManager.Instance.DestroyCube(transform);
+            AudioSource.PlayClipAtPoint(GameManager.Instance.cubeDestroySound, transform.position);
         }
     }
 
@@ -128,8 +132,8 @@ public class ConnectedCube : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Diamond"))
         {
-            Destroy(other.gameObject);
-            GameManager.Instance.AddScore();
+            // Destroy(other.gameObject);
+            GameManager.Instance.HitDiamond(other.gameObject);
         }
     }
 

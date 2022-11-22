@@ -11,6 +11,8 @@ public class CubeMovingBack : MonoBehaviour
     }
     void Update()
     {
+        if (GameManager.Instance.isGamePaused) return;
+        
         LavaRaycast();
 
         Vector3 moveVec = Vector3.back * Time.deltaTime * GameManager.Instance.playerForwardSpeed;
